@@ -1,0 +1,14 @@
+#+title: Readme
+#+author: Apollo Daniel
+
+This is the frontend for the *shrt_link* project, a link shortener created for learning purposes.
+
+Some of the technologies used are:
+- Sveltekit
+- Bootstrap 5
+
+The project is still in development and has room to mature, but for now, it is functioning quite well.
+
+
+* Preview
+[[file:screenshots/screenshot-001.png]]
