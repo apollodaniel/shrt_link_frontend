@@ -1,16 +1,19 @@
 <script lang="ts">
 	import { Button } from '@sveltestrap/sveltestrap';
+	import { onMount } from 'svelte';
 
-	export let data;
+	const { data } = $props();
+
+	onMount(() => {
+		if (data.redirectTo) {
+			window.open(data.redirectTo, '_self');
+		}
+	});
 </script>
 
 {#if !data.isExcludedLayout}
 	<nav>
-		<h1
-			on:click={() => {
-				window.open('/', '_self');
-			}}
-		>
+		<h1 href="/">
 			shrt <span>link</span>
 		</h1>
 		<ul>

@@ -1,7 +1,7 @@
 <!--Login page-->
 
 <script lang="ts">
-	import { REGEX_VALIDATORS } from '$lib';
+	import { REGEX_VALIDATORS, isErrorEntry } from '$lib';
 	import {
 		Badge,
 		Button,
@@ -11,6 +11,8 @@
 		InputGroup,
 		InputGroupText
 	} from '@sveltestrap/sveltestrap';
+	import { AuthHelper } from '../helper';
+	import type { ErrorEntry } from '$lib/types';
 
 	let passwordFieldFocused = $state(false);
 	let obscurePassword = $state(true);
@@ -20,11 +22,16 @@
 	);
 	let passwordErrorMessages: string[] = $state(allPasswordErrorMessages);
 
-	let email = $state('');
-	let password = $state('');
-	let confirmPassword = $state('');
+	let firstName = $state('Apollo');
+	let lastName = $state('Alves');
+	let email = $state('apollo@gmail.com');
+	let password = $state('Apollo2024$');
+	let confirmPassword = $state('Apollo2024$');
 
-	function onChangePassword(event: Event) {
+	let emailErrorMessage: string | undefined = $state(undefined);
+	let passwordErrorMessage: string | undefined = $state(undefined);
+
+	function onChangePassword() {
 		const value: string = password;
 		passwordErrorMessages = [];
 		if ((value.match(REGEX_VALIDATORS.password.hasEightDigits.regex) || []).length === 0) {
@@ -52,6 +59,39 @@
 			passwordErrorMessages.push(REGEX_VALIDATORS.password.startsCapitalized.errorMessage);
 		}
 	}
+
+	let isErrorFields = $state(true);
+
+	$effect(() => {
+		isErrorFields =
+			(email.match(REGEX_VALIDATORS.email.regex) || []).length === 0 ||
+			passwordErrorMessages.length > 0 ||
+			password != confirmPassword;
+	});
+
+	async function registerUser() {
+		const response = await AuthHelper.registerUser({
+			firstName,
+			lastName,
+			email,
+			password
+		});
+		if (response.ok) {
+			window.open('/', '_self');
+		} else if (isErrorEntry(response.body)) {
+			const typedResponse: ErrorEntry = response.body;
+			console.log(typedResponse);
+
+			switch (typedResponse.field) {
+				case 'email':
+					emailErrorMessage = typedResponse.message;
+					break;
+				case 'password':
+					passwordErrorMessage = typedResponse.message;
+					break;
+			}
+		}
+	}
 </script>
 
 <Card class="p-5 gap-4">
@@ -60,20 +100,54 @@
 	<div class="d-flex flex-column gap-1">
 		<Input
 			disabled={false}
-			invalid={(email.match(REGEX_VALIDATORS.email.regex) || []).length === 0 &&
-				email.length > 0}
+			invalid={(firstName.match(REGEX_VALIDATORS.firstName.regex) || []).length === 0 &&
+				firstName.length > 0}
+			placeholder="First name"
+			plaintext={false}
+			reverse={false}
+			type="text"
+			bind:value={firstName}
+		/>
+		{#if (firstName.match(REGEX_VALIDATORS.firstName.regex) || []).length === 0 && firstName.length > 0}
+			<div class="invalid-feedback">{REGEX_VALIDATORS.firstName.errorMessage}</div>
+		{/if}
+		<Input
+			disabled={false}
+			invalid={(lastName.match(REGEX_VALIDATORS.lastName.regex) || []).length === 0 &&
+				lastName.length > 0}
+			placeholder="Last name"
+			plaintext={false}
+			reverse={false}
+			type="text"
+			bind:value={lastName}
+		/>
+		{#if (lastName.match(REGEX_VALIDATORS.lastName.regex) || []).length === 0 && lastName.length > 0}
+			<div class="invalid-feedback">{REGEX_VALIDATORS.lastName.errorMessage}</div>
+		{/if}
+		<Input
+			disabled={false}
+			invalid={((email.match(REGEX_VALIDATORS.email.regex) || []).length === 0 &&
+				email.length > 0) ||
+				typeof emailErrorMessage == 'string'}
 			placeholder="Email"
 			plaintext={false}
 			reverse={false}
 			type="email"
-			feedback={REGEX_VALIDATORS.email.errorMessage}
 			bind:value={email}
+			on:keydown={() => {
+				emailErrorMessage = undefined;
+			}}
 		/>
-
+		{#if ((email.match(REGEX_VALIDATORS.email.regex) || []).length === 0 && email.length > 0) || emailErrorMessage}
+			<div class="invalid-feedback">
+				{emailErrorMessage ? emailErrorMessage : REGEX_VALIDATORS.email.errorMessage}
+			</div>
+		{/if}
 		<InputGroup>
 			<Input
 				disabled={false}
-				invalid={passwordErrorMessages.length > 0 && password.length > 0}
+				invalid={(passwordErrorMessages.length > 0 && password.length > 0) ||
+					passwordErrorMessage}
 				placeholder="Password"
 				plaintext={false}
 				reverse={false}
@@ -83,6 +157,9 @@
 					passwordFieldFocused = true;
 				}}
 				bind:value={password}
+				on:change={() => {
+					if (passwordErrorMessage) passwordErrorMessage = undefined;
+				}}
 			/>
 			<InputGroupText class="p-0">
 				<Button
@@ -93,15 +170,22 @@
 				>
 			</InputGroupText>
 		</InputGroup>
-		{#if passwordFieldFocused && passwordErrorMessages.length != 0}
-			<div id="password-errors">
-				{#each allPasswordErrorMessages as errorMessage}
-					<Badge
-						color={passwordErrorMessages.includes(errorMessage) ? 'danger' : 'success'}
-						>{errorMessage}</Badge
-					>
-				{/each}
-			</div>
+		{#if (passwordErrorMessages.length > 0 && password.length > 0) || passwordErrorMessage}
+			{#if passwordErrorMessage}
+				<div class="invalid-feedback">
+					{passwordErrorMessage}
+				</div>
+			{:else}
+				<div id="password-errors">
+					{#each allPasswordErrorMessages as errorMessage}
+						<Badge
+							color={passwordErrorMessages.includes(errorMessage)
+								? 'danger'
+								: 'success'}>{errorMessage}</Badge
+						>
+					{/each}
+				</div>
+			{/if}
 		{/if}
 		<Input
 			disabled={false}
@@ -116,8 +200,11 @@
 			<div class="invalid-feedback">Must match password</div>
 		{/if}
 	</div>
-	<Button class="mt-2" color="primary" on:click={() => (obscurePassword = !obscurePassword)}
-		>Register <Icon hidden name="box-arrow-in-right" /></Button
+	<Button
+		class="mt-2"
+		color={isErrorFields ? 'secondary' : 'primary'}
+		on:click={isErrorFields ? () => {} : registerUser}
+		disabled={isErrorFields}>Register <Icon hidden name="box-arrow-in-right" /></Button
 	>
 	<span>Already have an account? <a href="/auth"> Login</a></span>
 </Card>

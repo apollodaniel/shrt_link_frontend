@@ -1,8 +1,8 @@
 <!--Login page-->
 
 <script lang="ts">
+	import { isErrorEntry, REGEX_VALIDATORS } from '$lib';
 	import {
-		Badge,
 		Button,
 		Card,
 		Icon,
@@ -10,11 +10,39 @@
 		InputGroup,
 		InputGroupText
 	} from '@sveltestrap/sveltestrap';
+	import { AuthHelper } from './helper';
+	import type { ErrorEntry } from '$lib/types';
 
 	let obscurePassword = $state(true);
 
+	let emailErrorMessage: string | undefined = $state(undefined);
+	let passwordErrorMessage: string | undefined = $state(undefined);
+
 	let email = $state('');
 	let password = $state('');
+
+	async function loginUser() {
+		const response = await AuthHelper.loginUser({
+			email,
+			password
+		});
+
+		if (response.ok) {
+			window.open('/', '_self');
+		} else if (isErrorEntry(response.body)) {
+			const typedResponse: ErrorEntry = response.body;
+			console.log(typedResponse);
+
+			switch (typedResponse.field) {
+				case 'email':
+					emailErrorMessage = typedResponse.message;
+					break;
+				case 'password':
+					passwordErrorMessage = typedResponse.message;
+					break;
+			}
+		}
+	}
 </script>
 
 <Card class="p-5 gap-4">
@@ -23,7 +51,9 @@
 	<div class="d-flex flex-column gap-1">
 		<Input
 			disabled={false}
-			invalid={false}
+			invalid={((email.match(REGEX_VALIDATORS.email.regex) || []).length === 0 &&
+				email.length > 0) ||
+				emailErrorMessage}
 			placeholder="Email"
 			plaintext={false}
 			reverse={false}
@@ -31,6 +61,11 @@
 			valid={false}
 			bind:value={email}
 		/>
+		{#if ((email.match(REGEX_VALIDATORS.email.regex) || []).length === 0 && email.length > 0) || emailErrorMessage}
+			<div class="invalid-feedback">
+				{emailErrorMessage ? emailErrorMessage : REGEX_VALIDATORS.email.errorMessage}
+			</div>
+		{/if}
 		<InputGroup>
 			<Input
 				disabled={false}
@@ -49,8 +84,13 @@
 				>
 			</InputGroupText>
 		</InputGroup>
+		{#if passwordErrorMessage}
+			<div class="invalid-feedback">
+				{passwordErrorMessage}
+			</div>
+		{/if}
 	</div>
-	<Button class="mt-2" color="primary" on:click={() => (obscurePassword = !obscurePassword)}
+	<Button class="mt-2" color="primary" on:click={loginUser}
 		>Login <Icon hidden name="box-arrow-in-right" /></Button
 	>
 	<span>Don't have an account? <a href="/auth/register"> Sign up</a></span>

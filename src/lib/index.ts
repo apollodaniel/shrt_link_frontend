@@ -1,4 +1,6 @@
 // place files you want to import through the `$lib` alias in this folder.
+import { PUBLIC_API_URL } from '$env/static/public';
+import type { ErrorEntry } from './types';
 
 export const REGEX_VALIDATORS = {
 	email: {
@@ -26,29 +28,27 @@ export const REGEX_VALIDATORS = {
 			regex: /^[A-Z]/,
 			errorMessage: 'Start with a capital letter.'
 		}
+	},
+	firstName: {
+		regex: /^[A-Z][a-zA-Z]{1,}$/,
+		errorMessage: 'First name must start with a capital letter and contain only letters.'
+	},
+	lastName: {
+		regex: /^[A-Z][a-zA-Z]{1,}$/,
+		errorMessage: 'Last name must start with a capital letter and contain only letters.'
 	}
 };
 
-export type UrlSummary = {
-	url: {
-		id: string;
-		originalUrl: string;
-		creationDate: Date;
-	};
-	countByCountry: { country: string; count: string }[];
-	countByDevice: { device: string; count: string }[];
-	countByBrowser: { browser: string; count: string }[];
-	countByDay: { day: Date; count: string }[];
-	countByTimeOfDay: { hour: string; count: string }[];
-	totalClicks: number;
-};
+export const parseRoute = (route: string) => `${PUBLIC_API_URL}${route}`;
+export const parseApiRoute = (route: string) => `${PUBLIC_API_URL}/api/v1${route}`;
 
-export type UrlGeneralSummary = {
-	countByUrl: { id: string; count: string }[];
-	countByCountry: { country: string; count: string }[];
-	countByDevice: { device: string; count: string }[];
-	countByBrowser: { browser: string; count: string }[];
-	countByDay: { day: Date; count: string }[];
-	countByTimeOfDay: { hour: string; count: string }[];
-	totalClicks: number;
-};
+export function isErrorEntry(err: any): boolean {
+	return (
+		err &&
+		typeof err === 'object' &&
+		typeof err.code === 'string' &&
+		typeof err.message === 'string' &&
+		!(err.field && typeof err.field !== 'string') &&
+		typeof err.statusCode === 'number'
+	);
+}

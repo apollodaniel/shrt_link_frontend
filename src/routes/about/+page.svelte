@@ -7,6 +7,7 @@
 		import { Card, CardBody, CardHeader } from '@sveltestrap/sveltestrap';
 	</script>
 
+	
 	<Card>
 		<CardBody>
 			<h2>Our Mission: Simplifying the Internet, One Link at a Time</h2>
