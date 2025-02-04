@@ -10,7 +10,8 @@
 	const { data } = $props();
 	const urlSummary: UrlSummary = data.urlSummary;
 
-	let urlName = $state(urlSummary.url.originalUrl);
+	let urlName = $state(urlSummary.url.id);
+	let shortenedUrl = $state(urlSummary.url.originalUrl);
 
 	let showDeletePopupModal = $state(false);
 
@@ -25,6 +26,7 @@
 
 	onMount(() => {
 		urlName = `${document.location.host}/${urlSummary.url.id}`;
+		shortenedUrl = `${window.location.href.replace(window.location.pathname, '')}/${urlSummary.url.id}`;
 		window.addEventListener('resize', updatePosition);
 
 		return () => {
@@ -49,7 +51,7 @@
 		<ModalHeader>
 			<h2>Delete url</h2>
 		</ModalHeader>
-		<ModalBody>Are you sure you want do delete the url?</ModalBody>
+		<ModalBody>Are you sure you want to delete the url?</ModalBody>
 		<ModalFooter>
 			<Button color="danger" on:click={deleteUrl}>Delete</Button>
 			<Button color="secondary" on:click={() => (showDeletePopupModal = false)}>Cancel</Button
@@ -65,7 +67,7 @@
 	>
 </div>
 <hr />
-<a class="fs-5 url" href={urlName}>{urlName}</a><br />
+<a class="fs-5 url" href={shortenedUrl}>{urlName}</a><br />
 <a class="url" style="color: black;" href={urlSummary.url.originalUrl}
 	>{urlSummary.url.originalUrl}</a
 >

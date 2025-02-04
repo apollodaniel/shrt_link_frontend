@@ -29,7 +29,7 @@ export class AuthHelper {
 			credentials: 'include'
 		});
 		return {
-			body: await response.text(),
+			body: !response.ok ? await response.json() : await response.text(),
 			status: response.status,
 			ok: response.ok
 		};
@@ -46,7 +46,7 @@ export class AuthHelper {
 			credentials: 'include'
 		});
 		return {
-			body: await response.text(),
+			body: !response.ok ? await response.json() : await response.text(),
 			status: response.status,
 			ok: response.ok
 		};

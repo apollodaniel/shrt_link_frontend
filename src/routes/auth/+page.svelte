@@ -53,13 +53,14 @@
 			disabled={false}
 			invalid={((email.match(REGEX_VALIDATORS.email.regex) || []).length === 0 &&
 				email.length > 0) ||
-				emailErrorMessage}
+				typeof emailErrorMessage == 'string'}
 			placeholder="Email"
 			plaintext={false}
 			reverse={false}
 			type="email"
 			valid={false}
 			bind:value={email}
+			on:keydown={() => (emailErrorMessage = undefined)}
 		/>
 		{#if ((email.match(REGEX_VALIDATORS.email.regex) || []).length === 0 && email.length > 0) || emailErrorMessage}
 			<div class="invalid-feedback">
@@ -74,6 +75,8 @@
 				reverse={false}
 				type={obscurePassword ? 'password' : 'text'}
 				bind:value={password}
+				invalid={typeof passwordErrorMessage == 'string'}
+				on:keydown={() => (passwordErrorMessage = undefined)}
 			/>
 			<InputGroupText class="p-0">
 				<Button
@@ -83,12 +86,12 @@
 					><Icon name={obscurePassword ? 'eye-fill' : 'eye-slash-fill'} /></Button
 				>
 			</InputGroupText>
+			{#if typeof passwordErrorMessage == 'string'}
+				<div class="invalid-feedback">
+					{passwordErrorMessage}
+				</div>
+			{/if}
 		</InputGroup>
-		{#if passwordErrorMessage}
-			<div class="invalid-feedback">
-				{passwordErrorMessage}
-			</div>
-		{/if}
 	</div>
 	<Button class="mt-2" color="primary" on:click={loginUser}
 		>Login <Icon hidden name="box-arrow-in-right" /></Button

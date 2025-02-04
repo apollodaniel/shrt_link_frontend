@@ -22,11 +22,11 @@
 	);
 	let passwordErrorMessages: string[] = $state(allPasswordErrorMessages);
 
-	let firstName = $state('Apollo');
-	let lastName = $state('Alves');
-	let email = $state('apollo@gmail.com');
-	let password = $state('Apollo2024$');
-	let confirmPassword = $state('Apollo2024$');
+	let firstName = $state('');
+	let lastName = $state('');
+	let email = $state('');
+	let password = $state('');
+	let confirmPassword = $state('');
 
 	let emailErrorMessage: string | undefined = $state(undefined);
 	let passwordErrorMessage: string | undefined = $state(undefined);

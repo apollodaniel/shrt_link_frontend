@@ -3,12 +3,6 @@
 	import { onMount } from 'svelte';
 
 	const { data } = $props();
-
-	onMount(() => {
-		if (data.redirectTo) {
-			window.open(data.redirectTo, '_self');
-		}
-	});
 </script>
 
 {#if !data.isExcludedLayout}

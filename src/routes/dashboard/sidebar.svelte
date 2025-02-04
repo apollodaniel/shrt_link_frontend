@@ -1,7 +1,17 @@
 <svelte:options customElement="side-bar" />
 
 <script>
-	import { Accordion, AccordionItem, Button, Icon } from '@sveltestrap/sveltestrap';
+	import { parseApiRoute } from '$lib';
+	import {
+		Accordion,
+		AccordionItem,
+		Button,
+		Icon,
+		Modal,
+		ModalBody,
+		ModalFooter,
+		ModalHeader
+	} from '@sveltestrap/sveltestrap';
 	import { onMount } from 'svelte';
 
 	let { urls = [] } = $props();
@@ -22,8 +32,33 @@
 			window.removeEventListener('resize', updateWidth);
 		};
 	});
+
+	let showLogoutModal = $state(false);
+
+	async function logoutUser() {
+		const response = await fetch(parseApiRoute('/auth/logout'), {
+			method: 'POST',
+			credentials: 'include'
+		});
+
+		if (response.ok) {
+			window.open('/', '_self');
+		}
+	}
 </script>
 
+{#if showLogoutModal}
+	<Modal isOpen={showLogoutModal}>
+		<ModalHeader>
+			<h2>Logout user</h2>
+		</ModalHeader>
+		<ModalBody>Are you sure you want to logout?</ModalBody>
+		<ModalFooter>
+			<Button color="danger" on:click={logoutUser}>Logout</Button>
+			<Button color="secondary" on:click={() => (showLogoutModal = false)}>Cancel</Button>
+		</ModalFooter>
+	</Modal>
+{/if}
 <div
 	class={`sidebar ${width < 900 ? 'floating' : ''} ${width < 900 && showSidebar ? 'visible' : ''}`}
 	style={`background-color: ${backgroundColor}`}
@@ -46,6 +81,12 @@
 	{:else}
 		<Button color="light" href="/dashboard/">Home</Button>
 	{/if}
+	<Button
+		color="light"
+		target="_self"
+		class="w-100 d-flex flex-column gap-2 justify-content-center align-items-center"
+		on:click={() => (showLogoutModal = true)}>Logout</Button
+	>
 
 	<h4>Url List</h4>
 	<div class="d-flex flex-column gap-1">
