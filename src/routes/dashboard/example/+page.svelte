@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { UrlGeneralSummary, UrlSummary } from '$lib';
+	import type { UrlGeneralSummary } from '$lib/types';
 	import { onMount } from 'svelte';
-	import AllTimeChart from './[id]/AllTimeChart.svelte';
-	import LastMonthChart from './[id]/LastMonthChart.svelte';
-	import CustomChart from './[id]/CustomChart.svelte';
+	import AllTimeChart from '$lib/Components/AllTimeChart.svelte';
+	import LastMonthChart from '$lib/Components/LastMonthChart.svelte';
+	import CustomChart from '$lib/Components/CustomChart.svelte';
 	import { Button, Card, CardBody, CardHeader, Input } from '@sveltestrap/sveltestrap';
 
 	const { data } = $props();

@@ -20,7 +20,7 @@ export type UrlSummary = {
 };
 
 export type UrlGeneralSummary = {
-	countByUrl: { id: string; count: string }[];
+	countByUrlId: { urlId: string; count: string }[];
 	countByCountry: { country: string; count: string }[];
 	countByDevice: { device: string; count: string }[];
 	countByBrowser: { browser: string; count: string }[];

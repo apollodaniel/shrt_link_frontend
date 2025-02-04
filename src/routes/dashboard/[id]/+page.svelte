@@ -1,14 +1,18 @@
 <script lang="ts">
-	import type { UrlGeneralSummary } from '$lib/types';
+	import type { UrlSummary } from '$lib/types';
 	import { onMount } from 'svelte';
 	import AllTimeChart from '$lib/Components/AllTimeChart.svelte';
-	import LastMonthChart from '$lib/Components/LastMonthChart.svelte';
 	import CustomChart from '$lib/Components/CustomChart.svelte';
-	import { Button, Card, CardBody, CardHeader, Input } from '@sveltestrap/sveltestrap';
-	import { parseApiRoute, REGEX_VALIDATORS } from '$lib';
+	import LastMonthChart from '$lib/Components/LastMonthChart.svelte';
+	import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@sveltestrap/sveltestrap';
+	import { parseApiRoute } from '$lib';
 
 	const { data } = $props();
-	const urlSummary: UrlGeneralSummary = data.urlSummary;
+	const urlSummary: UrlSummary = data.urlSummary;
+
+	let urlName = $state(urlSummary.url.originalUrl);
+
+	let showDeletePopupModal = $state(false);
 
 	let position = $state('right');
 
@@ -20,6 +24,7 @@
 	};
 
 	onMount(() => {
+		urlName = `${document.location.host}/${urlSummary.url.id}`;
 		window.addEventListener('resize', updatePosition);
 
 		return () => {
@@ -27,18 +32,10 @@
 		};
 	});
 
-	let newUrl = $state('');
-
-	async function shareUrl() {
-		const response = await fetch(parseApiRoute('/urls/'), {
-			method: 'POST',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				originalUrl: newUrl
-			})
+	async function deleteUrl() {
+		const response = await fetch(parseApiRoute(`/urls/${urlSummary.url.id}`), {
+			method: 'DELETE',
+			credentials: 'include'
 		});
 
 		if (response.ok) {
@@ -47,32 +44,42 @@
 	}
 </script>
 
-<h1>Home</h1>
+{#if showDeletePopupModal}
+	<Modal isOpen={showDeletePopupModal}>
+		<ModalHeader>
+			<h2>Delete url</h2>
+		</ModalHeader>
+		<ModalBody>Are you sure you want do delete the url?</ModalBody>
+		<ModalFooter>
+			<Button color="danger" on:click={deleteUrl}>Delete</Button>
+			<Button color="secondary" on:click={() => (showDeletePopupModal = false)}>Cancel</Button
+			>
+		</ModalFooter>
+	</Modal>
+{/if}
+
+<div class="d-flex flex-row justify-content-between align-items-start">
+	<h1>Url info</h1>
+	<Button color="primary" style="height: 48px;" on:click={() => (showDeletePopupModal = true)}
+		>Delete url</Button
+	>
+</div>
 <hr />
+<a class="fs-5 url" href={urlName}>{urlName}</a><br />
+<a class="url" style="color: black;" href={urlSummary.url.originalUrl}
+	>{urlSummary.url.originalUrl}</a
+>
 
-<Card>
-	<CardHeader>
-		<h4>Add new shortened url</h4>
-	</CardHeader>
-	<CardBody class="d-flex flex-row gap-3">
-		<div class="d-flex flex-column gap-1 w-100">
-			<Input
-				invalid={(newUrl.match(REGEX_VALIDATORS.newUrl.regex) || []).length == 0 &&
-					newUrl.length > 0}
-				placeholder="Your amazing url"
-				bind:value={newUrl}
-				style="height: 64px;"
-			/>
-			{#if (newUrl.match(REGEX_VALIDATORS.newUrl.regex) || []).length == 0 && newUrl.length > 0}
-				<div class="invalid-feedback">
-					{REGEX_VALIDATORS.newUrl.errorMessage}
-				</div>
-			{/if}
-		</div>
-
-		<Button style="width: 120px; height: 64px;" on:click={shareUrl}>Short it</Button>
-	</CardBody>
-</Card>
+<p class="mt-4 fs-6">
+	Created at {new Intl.DateTimeFormat('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+		second: '2-digit'
+	}).format(urlSummary.url.creationDate)}
+</p>
 
 <h3 class="mt-5">Summary</h3>
 
@@ -140,27 +147,6 @@
 			/>
 		{/key}
 	</div>
-</div>
-<div class="chart-item m-auto">
-	<h4>Total clicks by url</h4>
-	{#key position}
-		<CustomChart
-			chartType="pie"
-			data={urlSummary.countByUrlId.map((row) => row.count)}
-			label={urlSummary.countByUrlId.map((row) => row.urlId)}
-			description="Url click count"
-			name="Url"
-			onClick={(event, elements, chart) => {
-				if (elements.length > 0) {
-					const clickedElementIndex = elements[0].index;
-					const label = chart.data.labels[clickedElementIndex];
-
-					window.open('/dashboard/' + label, '_self');
-				}
-			}}
-			{position}
-		/>
-	{/key}
 </div>
 
 <style>

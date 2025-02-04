@@ -36,6 +36,10 @@ export const REGEX_VALIDATORS = {
 	lastName: {
 		regex: /^[A-Z][a-zA-Z]{1,}$/,
 		errorMessage: 'Last name must start with a capital letter and contain only letters.'
+	},
+	newUrl: {
+		regex: /https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
+		errorMessage: 'Invalid url'
 	}
 };
 

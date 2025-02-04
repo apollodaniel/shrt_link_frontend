@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { UrlSummary } from '$lib';
+	import type { UrlSummary } from '$lib/types';
 	import { onMount } from 'svelte';
-	import AllTimeChart from './AllTimeChart.svelte';
-	import CustomChart from './CustomChart.svelte';
-	import LastMonthChart from './LastMonthChart.svelte';
+	import AllTimeChart from '$lib/Components/AllTimeChart.svelte';
+	import CustomChart from '$lib/Components/CustomChart.svelte';
+	import LastMonthChart from '$lib/Components/LastMonthChart.svelte';
 	import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@sveltestrap/sveltestrap';
 
 	const { data } = $props();
