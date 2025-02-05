@@ -20,9 +20,7 @@
 			</ul>
 		</div>
 
-		<Button color="primary" class="mt-4" on:click={() => console.log('working')}
-			>Get started now</Button
-		>
+		<Button color="primary" class="mt-4" href="/auth/register">Get started now</Button>
 	</Card>
 </main>
 

@@ -10,9 +10,7 @@
 	</p>
 
 	<small class="mt-1">Free, Fast, and Reliable.</small>
-	<Button color="primary" class="mt-4" on:click={() => console.log('working')}
-		>Get started for free</Button
-	>
+	<Button color="primary" class="mt-4" href="/auth/register">Get started for free</Button>
 </main>
 
 <style>
