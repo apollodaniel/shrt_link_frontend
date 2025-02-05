@@ -13,12 +13,11 @@ export const load: LayoutLoad = async ({ route, fetch }) => {
 
 	const matchId = route.id?.match(/\/([0-9]|[a-zA-Z]{7})(?!dashboard)/);
 	console.log(matchId);
-	if (response.ok && includedRoutes.includes(route.id!)) {
+	console.log(route.id);
+	if (!response.ok && !nonAuthRoutes.includes(route.id) && matchId) {
+		redirect(307, '/');
+	} else if (response.ok && includedRoutes.includes(route.id!)) {
 		redirect(307, '/dashboard/');
-	} else if (!response.ok && !nonAuthRoutes.includes(route.id!)) {
-		if (matchId) {
-			redirect(307, '/');
-		}
 	}
 
 	return {

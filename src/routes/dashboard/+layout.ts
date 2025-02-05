@@ -10,7 +10,7 @@ export const load: LayoutLoad = async ({ fetch }) => {
 			'Content-Type': 'application/json'
 		}
 	});
-
+	console.log(response);
 	if (response.ok) {
 		const urls = await response.json();
 		console.log(urls);

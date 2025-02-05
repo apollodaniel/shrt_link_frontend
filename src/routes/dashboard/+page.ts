@@ -11,6 +11,7 @@ export const load: PageLoad = async ({ fetch }) => {
 		}
 	});
 
+	console.log(response);
 	if (response.ok) {
 		const urlSummary = await response.json();
 		console.log(urlSummary);

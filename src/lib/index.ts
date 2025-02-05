@@ -43,7 +43,7 @@ export const REGEX_VALIDATORS = {
 	}
 };
 
-export const parseRoute = (route: string) => `${PUBLIC_API_URL}${route}`;
+export const parseRoute = (route: string) => `${PUBLIC_API_URL}/api${route}`;
 export const parseApiRoute = (route: string) => `${PUBLIC_API_URL}/api/v1${route}`;
 
 export function isErrorEntry(err: any): boolean {
