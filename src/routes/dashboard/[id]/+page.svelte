@@ -89,6 +89,8 @@
 	Total clicks <b class="text-primary">{new Intl.NumberFormat().format(urlSummary.totalClicks)}</b
 	>
 </p>
+
+{#if urlSummary.totalClicks > 0}
 <div class="chart-list">
 	<div class="chart-item">
 		<h4>All Time clicks</h4>
@@ -150,6 +152,7 @@
 		{/key}
 	</div>
 </div>
+{/if}
 
 <style>
 	.chart-list {
